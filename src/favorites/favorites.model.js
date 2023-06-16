@@ -4,8 +4,7 @@ const mongoose = require('mongoose');
 
 const favoritesSchema = mongoose.Schema({
     noCuenta: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        type: String,
         required: true
     },
     apodo:{

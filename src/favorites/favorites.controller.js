@@ -10,8 +10,6 @@ exports.test = (req, res)=>{
 exports.add = async (req, res) => {
     try {
         let data = req.body;
-        let noCuentaExists = await User.findOne({_id: data.noCuenta})
-        if(!noCuentaExists) return res.status(404).send({message: 'No cuenta not found'})
         let favorites = new Favorites(data);
         await favorites.save();
         return res.send({ message: 'Favorite created sucessfully' , favorites});
@@ -54,9 +52,6 @@ exports.update = async(req, res)=>{
         let favoriteId = req.params.id;
         //obtener la data a actualizar
         let data = req.body;
-        //Validar que exista el numero de cuenta
-        let existNoCuenta = await User.findOne({_id: data.noCuenta});
-        if(!existNoCuenta) return res.status(404).send({message: 'No Cuenta not found'});
         //Actualizar
         let updatedFavorite = await Favorites.findOneAndUpdate(
             {_id: favoriteId},
