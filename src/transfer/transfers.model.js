@@ -3,9 +3,16 @@
 const mongoose = require('mongoose');
 
 const transfersSchema = mongoose.Schema({
-    name: {
-        type: String,
-        required: true
+    nocuenta: {type: mongoose.Schema.Types.ObjectId, ref: 'user'},
+    dpi: {type: mongoose.Schema.Types.ObjectId, ref: 'user'},
+    monto: {
+        type: Number,
+        require: true
+    },
+    date: {
+        type: Date,
+        required: true,
+        uppercase: true
     }
 });
 
