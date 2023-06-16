@@ -56,6 +56,7 @@ exports.updateProduct = async(req, res)=>{
     try{
         let productId = req.params.id;
         let data = req.body;
+        let existProduct= await Product.findOne({ name: data.name });
         if (existProduct) {
             return res.send({ message: 'Product already created' })
         }
