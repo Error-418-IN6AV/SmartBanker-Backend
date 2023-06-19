@@ -7,7 +7,7 @@ const productController = require('./product.controller');
 
 
 api.get('/soldOut',[ /* ensureAuth, isAdmin */ ],productController.sold_out);
-api.post('/search',[ /* ensureAut */ ], productController.search)
+
 api.post('/add', [ /* ensureAuth, isAdmin */ ]  ,productController.addProduct);
 api.get('/get', [ /* ensureAuth */ ],productController.getProducts);
 api.delete('/delete/:id',[ /* ensureAuth,isAdmin */ ], productController.deleteProduct)

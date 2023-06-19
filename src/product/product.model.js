@@ -9,16 +9,23 @@ const productSchema = mongoose.Schema({
     },
     description: {
         type: String,
-        required: true
+   
     },
     price: {
         type: Number,
         required: true,
     },
+    descuento:{
+        type:Number,
+    },
+    total:{
+        type:Number,
+    },
     stock: {
         type: Number,
         required: true
     },
+   
 
 });
 

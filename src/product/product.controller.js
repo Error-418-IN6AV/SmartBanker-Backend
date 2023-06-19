@@ -1,6 +1,6 @@
 'use strict'
 const Product = require('./product.model');
-/* const { validateData } = require('../utils/validate') */
+const { validateData } = require('../utils/validate')
 
 exports.test = (req, res)=>{
     res.send({message: 'Test function is running'});
@@ -15,7 +15,10 @@ exports.addProduct = async(req, res)=>{
             return res.send({ message: 'Product already created' })
         }
 
-     
+
+        var descuento = (100 - data.descuento)/100
+        let price = data.price*descuento
+        data.total = price
         let product = new Product(data);
         await product.save();
         return res.send({message: 'Product saved sucessfully', product})
@@ -43,9 +46,9 @@ exports.getProduct = async(req, res)=>{
     
         let productId = req.params.id;
        
-        let product = await Product.findOne({_id: productId})
-        if(!product) return res.status(404).send({message: 'Product not found'});
-        return res.send({message: 'Product found:', product});
+        let products = await Product.findOne({_id: productId})
+        if(!products) return res.status(404).send({message: 'Product not found'});
+        return res.send({message: 'Product found:', products});
     }catch(err){
         console.error(err);
         return res.status(500).send({message: 'Error getting product'});
@@ -60,7 +63,9 @@ exports.updateProduct = async(req, res)=>{
         if (existProduct) {
             return res.send({ message: 'Product already created' })
         }
-     
+        var descuento = (100 - data.descuento)/100
+        let price = data.price*descuento
+        data.total = price
         let updatedProduct = await Product.findOneAndUpdate(
             {_id: productId},
             data,
@@ -88,27 +93,6 @@ exports.deleteProduct = async(req, res)=>{
         return res.status(500).send({message: 'Error deleting Product'});
     }
 }
-
-exports.search = async(req, res)=>{
-    try{
-        let params = {
-            name: req.body.name
-        }
-        let validate = validateData(params)
-        if(validate) return res.status(400).send(validate);
-        let products = await Product.find({
-            name: {
-                $regex: params.name,
-                $options: 'i'
-            }
-        })
-        return res.send({products})
-    }catch(err){
-        console.error(err);
-        return res.status(500).send({message: 'Error searching Product'});
-    }
-}
-
 
 exports.sold_out = async (req, res) => {
     const productos = await Product.find(
