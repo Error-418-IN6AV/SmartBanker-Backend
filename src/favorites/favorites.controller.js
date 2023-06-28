@@ -10,6 +10,22 @@ exports.test = (req, res)=>{
 exports.add = async (req, res) => {
     try {
         let data = req.body;
+        let user = req.user.sub 
+        const userExists = await User.exists({ nocuenta: data.nocuenta });
+        if (!userExists) {
+            return res.send({ message: 'Invalid nocuenta. User does not exist' });
+        }
+        //validar duplicados
+        const existingFavorite = await Favorites.findOne({ user, nocuenta: data.nocuenta });
+        if (existingFavorite) {
+        return res.send({ message: 'Favorite with the same nocuenta already exists' });
+        }
+        //validar que no me deje agregar a mi mimsmo a favorits
+        const userFavorite = await User.findOne({ nocuenta: data.nocuenta });
+        if (userFavorite._id.toString() === user) {
+            return res.send({ message: 'You cannot add the favorite to yourself' });
+        }
+        data.user = req.user.sub
         let favorites = new Favorites(data);
         await favorites.save();
         return res.send({ message: 'Favorite created sucessfully' , favorites});
@@ -19,23 +35,12 @@ exports.add = async (req, res) => {
     }
 }
 
-exports.gets = async(req, res)=>{
-    try{
-        //Buscar datos
-        let favorites = await Favorites.find().populate('noCuenta');
-        return res.send({message: 'Favorites found', favorites});
-    }catch(err){
-        console.error(err);
-        return res.status(500).send({message: 'Error getting favorites'});
-    }
-}
-
-exports.get = async(req, res)=>{
+exports.getById = async(req, res)=>{
     try{
         //Obtener el Id 
         let favoriteId = req.params.id;
         //Buscarlo en BD
-        let favorite = await Favorites.findOne({_id: favoriteId}).populate('noCuenta');
+        let favorite = await Favorites.findOne({_id: favoriteId}).populate('nocuenta');
         //Valido que exista 
         if(!favorite) return res.status(404).send({message: 'Favorite not found'});
         //Si existe lo devuelvo
@@ -46,12 +51,42 @@ exports.get = async(req, res)=>{
     }
 }
 
+exports.get = async(req, res)=>{
+    try{      
+        const userId = req.user.sub;
+        const favorites = await Favorites.find({ user: userId });
+        if (!favorites) {
+            return res.status(404).send({ message: 'Favorites not found' });
+        }
+        return res.send({ message: 'Favorites found', favorites });
+    }catch(err){
+        console.error(err);
+        return res.status(500).send({message: 'Error getting favorites'});
+    }
+}
+
 exports.update = async(req, res)=>{
     try{
         //obtener el Id del favorito
         let favoriteId = req.params.id;
         //obtener la data a actualizar
         let data = req.body;
+        const user = req.user.sub;
+        //validar que exista el nocuenta a actualizar
+        const userExists = await User.exists({ nocuenta: data.nocuenta });
+        if (!userExists) {
+            return res.send({ message: 'Invalid nocuenta. User does not exist' });
+        }
+        //validar duplicados
+        const existingFavorite = await Favorites.findOne({ user, nocuenta: data.nocuenta });
+        if (existingFavorite) {
+        return res.send({ message: 'Favorite with the same nocuenta already exists' });
+        }
+        //validar que no me deje actualizar a mi mimsmo
+        const userFavorite = await User.findOne({ nocuenta: data.nocuenta });
+        if (userFavorite._id.toString() === user) {
+            return res.send({ message: 'You cannot update the favorite to yourself' });
+        }
         //Actualizar
         let updatedFavorite = await Favorites.findOneAndUpdate(
             {_id: favoriteId},

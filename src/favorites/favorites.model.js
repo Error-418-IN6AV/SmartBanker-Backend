@@ -3,7 +3,13 @@
 const mongoose = require('mongoose');
 
 const favoritesSchema = mongoose.Schema({
-    noCuenta: {
+    user:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+
+    },
+    nocuenta: {
         type: String,
         required: true
     },
