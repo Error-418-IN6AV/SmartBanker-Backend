@@ -47,6 +47,10 @@ const comprasSchema = mongoose.Schema({
         type: String,
      
     },
+    cantidad:{
+      type:Number,
+      default:1
+    },
     fecha:{
         type:Date,
         default:Date.now()
