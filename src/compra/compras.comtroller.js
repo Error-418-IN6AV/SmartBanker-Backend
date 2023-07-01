@@ -8,7 +8,7 @@ exports.add = async (req, res) => {
     try {
         let data = req.body;
         let user = req.user.sub
-
+//////// parte de comprar solo un elemento 
 /*         let existCompra = await Compra.findOne({ user: user, product: data.product }); */
 
         let existProducto = await Product.findOne({ _id: data.product })
