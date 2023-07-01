@@ -9,10 +9,10 @@ exports.add = async (req, res) => {
         let data = req.body;
         let user = req.user.sub
 
-        let existCompra = await Compra.findOne({ user: user, product: data.product });
+/*         let existCompra = await Compra.findOne({ user: user, product: data.product }); */
 
         let existProducto = await Product.findOne({ _id: data.product })
-        if (existCompra) return res.send({ message: 'You have already bought this product in the past' });
+/*         if (existCompra) return res.send({ message: 'You have already bought this product in the past' }); */
 //////////////////////////////////////////////////////////////
         data.user = req.user.sub
         data.producto = existProducto.name
