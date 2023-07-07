@@ -21,6 +21,9 @@ const productSchema = mongoose.Schema({
     total:{
         type:Number,
     },
+    image:{
+        type:String
+    },
     stock: {
         type: Number,
         required: true

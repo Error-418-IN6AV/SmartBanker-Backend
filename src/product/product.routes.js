@@ -3,15 +3,20 @@
 const express = require('express');
 const api = express.Router();
 const productController = require('./product.controller');
-/* const { ensureAuth, isAdmin } = require('../services/authenticated'); */
+const { ensureAuth, isAdmin } = require('../services/authenticated');
+const connectMultiparty = require('connect-multiparty')
+const upload = connectMultiparty({uploadDir: './uploads/products'})
 
 
-api.get('/soldOut',[ /* ensureAuth, isAdmin */ ],productController.sold_out);
 
-api.post('/add', [ /* ensureAuth, isAdmin */ ]  ,productController.addProduct);
-api.get('/get', [ /* ensureAuth */ ],productController.getProducts);
-api.delete('/delete/:id',[ /* ensureAuth,isAdmin */ ], productController.deleteProduct)
-api.get('/getProduct/:id', [ /* ensureAuth */ ],productController.getProduct);
-api.put('/update/:id', [ /* ensureAuth, isAdmin  */] ,productController.updateProduct);
+
+
+api.post('/add'  ,productController.addProduct);
+api.get('/get',productController.getProducts);
+api.delete('/delete/:id', productController.deleteProduct)
+api.get('/getProduct/:id',productController.getProduct);
+api.put('/update/:id' ,productController.updateProduct);
+api.put('/addImage/:id', upload, productController.addImage)
+api.get('/getImage/:fileName', upload, productController.getImage)
 
 module.exports = api;
