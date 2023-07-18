@@ -15,6 +15,10 @@ exports.userAdmin = async () => {
             surname: 'ADMINB',
             username: 'ADMINB',
             phone: '58554785',
+            dpi: '1252525632522',
+            balance: '99999',
+            nocuenta: '12522548',
+            location: 'Guatemala',
             email: 'ADMINB@gmail.com',
             password: 'ADMINB',
             role: 'ADMIN'
@@ -73,6 +77,7 @@ exports.save = async (req, res) => {
         data.nocuenta = Math.floor(Math.random() * 999999999);
         if (data.monthlyincome < 100) return res.status(400).send({ message: 'Error Mont' });
         if (data.balance < 150) return res.status(400).send({ message: 'Error Balance' });
+        data.movements = 1;
         data.password = await encrypt(data.password);
         let user = new User(data);
         await user.save();
@@ -96,8 +101,18 @@ exports.login = async (req, res) => {
         if (user && await checkPassword(data.password, user.password)) {
             let userLogged = {
                 name: user.name,
+                surname: user.surname,
                 username: user.username,
-                role: user.role
+                nocuenta: user.nocuenta,
+                dpi: user.dpi,
+                location: user.location,
+                phone: user.phone,
+                email: user.email,
+                namework: user.namework,
+                balance: user.balance,
+                movements: user.movements,
+                role: user.role,
+                id: user._id
             }
             let token = await createToken(user)
             return res.send({ message: 'User logged sucessfully', token, userLogged });

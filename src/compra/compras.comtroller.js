@@ -18,6 +18,10 @@ exports.add = async (req, res) => {
         data.producto = existProducto.name
         data.descuento = existProducto.descuento
         data.precioInicial = existProducto.price
+        //////////////////////////////////////////////////////////////////
+        let existUser = await User.findOne({ _id: user });
+        let movimiento = existUser.movements + 1;
+        let UpdateMovements = await User.findOneAndUpdate({ _id: user }, { movements: movimiento }, { new: true });
         ///////////////////////////////////////////////////////////       
         if (data.nit.length == 0) {
             data.nit = 'C/F'

@@ -14,11 +14,17 @@ exports.save = async (req, res) => {
         let user = req.user.sub;
         data.date = Date.now()
         let existnocuenta = await User.findOne({ nocuenta: data.nocuenta });
-        if (!existnocuenta) return res.status(400).send({ message: 'Account not found' });
+        let balance = await User.findOne({ _id: user })
+        if (balance.balance <= 0 || balance.balance < data.monto) return res.send({ message: '❌ Your balance is insufficient to make the required transfer.' });
+        if (!existnocuenta) return res.status(400).send({ message: '❌  The account number does not exist, please try again.' });
         let existUser = await User.findOne({ _id: user });
         if (!existUser) return res.status(400).send({ message: 'User not found' });
         let existdpi = await User.findOne({ dpi: data.dpi });
-        if (!existdpi) return res.status(400).send({ message: 'DPI not found' });
+        if (!existdpi) return res.status(400).send({ message: '❌ The DPI does not exist, please try again.' });
+        if (data.monto > 2000) return res.status(400).send({ message: '❌ The amount cannot exceed $2000.' });
+        //Agrega un movimiento al usuario
+        let movimiento = existUser.movements + 1;
+        let UpdateMovements = await User.findOneAndUpdate({ _id: user }, { movements: movimiento }, { new: true });
         //Transfiere los datos a la cuenta
         let saldo = existnocuenta.balance + Number(data.monto);
         let updateAcound = await User.findOneAndUpdate({ nocuenta: data.nocuenta }, { balance: saldo }, { new: true });
@@ -28,10 +34,10 @@ exports.save = async (req, res) => {
         data.user = req.user.sub
         let transfers = new Transfers(data);
         await transfers.save();
-        return res.send({ message: 'Transfer sucessfully' });
+        return res.send({ message: '✔️ Transfer sucessfully' });
     } catch (err) {
         console.error(err);
-        return res.status(500).send({ message: 'Error saving Transfer', error: err.message });
+        return res.status(500).send({ message: '❌ Error saving Transfer', error: err.message });
     }
 }
 
@@ -45,7 +51,7 @@ exports.getTransfer = async (req, res) => {
         return res.send({ message: 'Transfers found', transfers });
     } catch (err) {
         console.error(err);
-        return res.status(500).send({ message: 'Error getting Transfers' });
+        return res.status(500).send({ message: '❌ Error getting Transfers' });
     }
 }
 
@@ -57,7 +63,7 @@ exports.getTransfers = async (req, res) => {
         return res.send({ message: 'Transfer found:', transfers });
     } catch (err) {
         console.error(err);
-        return res.status(500).send({ message: 'Error getting transfer' });
+        return res.status(500).send({ message: '❌ Error getting transfer' });
     }
 }
 
@@ -95,19 +101,20 @@ exports.updatedTransfer = async (req, res) => {
                 { new: true }
             )
 
-            return res.send({ message: 'The transaction has been updated', updatedTransfer });
+            return res.send({ message: '✔️ The transaction has been updated', updatedTransfer });
 
         }
-        return res.send({ message: 'The transaction can only be edited in the first minute' });
+        return res.send({ message: '⏳ The transaction can only be edited in the first minute' });
 
     } catch (err) {
         console.error(err);
-        return res.status(500).send({ message: 'Error updating Deposit.' })
+        return res.status(500).send({ message: '❌ Error updating Deposit.' })
     }
 }
 
 exports.delete = async (req, res) => {
     try {
+        let data = req.body;
         let user = req.user.sub;
         let transferId = req.params.id;
         //Buscar la transferencia y traer el monto enviado
@@ -118,6 +125,13 @@ exports.delete = async (req, res) => {
         let user2 = await User.findOne({ dpi: transferencia.dpi });
         //Buscar al usuario y enviarle su nuevo saldo
         let user1 = await User.findOne({ _id: user })
+        //Elimina el movimiento
+        let movimiento = Number(user1.movements) - 1;
+        let user1Update = await User.findOneAndUpdate(
+            { _id: user },
+            { movements: movimiento },
+            { new: true }
+        )
         //Hace la validacion del tiempo
         if (Date.now() <= tiempo) {
             //Le añade lo que le tranfirio al usuario al el mismo
@@ -138,12 +152,12 @@ exports.delete = async (req, res) => {
             let transfer = await Transfers.findOneAndDelete(
                 { _id: transferId }
             )
-            return res.send({ message: 'The transfer was canceled' })
+            return res.send({ message: '✔️ The transfer was canceled' })
         }
-        return res.send({ message: 'Cancellation time has expired' })
+        return res.send({ message: '⏳ Cancellation time has expired' })
 
     } catch (error) {
         console.error(error);
-        res.status(500).send({ message: 'An error ocurred' })
+        res.status(500).send({ message: '❌ An error ocurred' })
     }
 }
