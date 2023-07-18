@@ -7,6 +7,7 @@ const { ensureAuth } = require('../services/authenticated');
 
 api.post('/login', userController.login);
 api.get('/getClient', userController.getClient);
+api.get('/getClientss', userController.getClientss);
 api.get('/get/:id', userController.getClients);
 api.get('/getWorker', userController.getWorker);
 api.get('/getW/:id', userController.getWorkers);

@@ -13,6 +13,10 @@ const favoritesSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    dpi: {
+        type: String,
+        required: true
+    },
     apodo:{
         type: String,
         required: true

@@ -15,6 +15,10 @@ exports.add = async (req, res) => {
         if (!userExists) {
             return res.send({ message: 'Invalid nocuenta. User does not exist' });
         }
+        const dpiExists = await User.exists({ dpi: data.dpi });
+        if (!dpiExists) {
+            return res.send({ message: 'DPI does not exist' });
+        }
         //validar duplicados
         const existingFavorite = await Favorites.findOne({ user, nocuenta: data.nocuenta });
         if (existingFavorite) {
