@@ -6,11 +6,11 @@ const userController = require('./user.controller');
 const { ensureAuth } = require('../services/authenticated');
 
 api.post('/login', userController.login);
-api.get('/getClient', userController.getClient);
-api.get('/getClientss', userController.getClientss);
-api.get('/get/:id', userController.getClients);
-api.get('/getWorker', userController.getWorker);
-api.get('/getW/:id', userController.getWorkers);
+api.get('/getClient', ensureAuth, userController.getClient);
+api.get('/getClientss', ensureAuth, userController.getClientss);
+api.get('/get/:id', ensureAuth, userController.getClients);
+api.get('/getWorker', ensureAuth, userController.getWorker);
+api.get('/getW/:id', ensureAuth, userController.getWorkers);
 api.put('/update/:id', ensureAuth, userController.update);
 api.delete('/delete/:id', ensureAuth, userController.deleteUser);
 api.get('/test', ensureAuth, userController.test);

@@ -7,7 +7,7 @@ const { ensureAuth } = require('../services/authenticated');
 const connectMultiparty = require('connect-multiparty')
 const upload = connectMultiparty({ uploadDir: './uploads/products' })
 
-api.post('/add', productController.addProduct);
+api.post('/add',  productController.addProduct);
 api.get('/get', productController.getProducts);
 api.delete('/delete/:id', productController.deleteProduct)
 api.get('/getProduct/:id', productController.getProduct);

@@ -1,6 +1,7 @@
 'use strict'
 
 const User = require('./user.model');
+const Transfers = require('../transfer/transfers.model');
 const { validateData, encrypt, checkPassword } = require('../utils/validate');
 const { createToken } = require('../services/jwt');
 
@@ -126,7 +127,7 @@ exports.login = async (req, res) => {
 
 exports.getClient = async (req, res) => {
     try {
-        let client = await User.find({ role: 'CLIENT' }).sort({balance: 1});
+        let client = await User.find({ role: 'CLIENT' }).sort({ balance: 1 });
         return res.send({ message: 'Client found', client });
     } catch (err) {
         console.error(err);
@@ -136,7 +137,7 @@ exports.getClient = async (req, res) => {
 
 exports.getClientss = async (req, res) => {
     try {
-        let client = await User.find({ role: 'CLIENT' }).sort({balance: -1});
+        let client = await User.find({ role: 'CLIENT' }).sort({ balance: -1 });
         return res.send({ message: 'Client found', client });
     } catch (err) {
         console.error(err);

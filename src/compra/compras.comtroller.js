@@ -19,9 +19,9 @@ exports.add = async (req, res) => {
         data.descuento = existProducto.descuento
         data.precioInicial = existProducto.price
         //////////////////////////////////////////////////////////////////
-        let existUser = await User.findOne({ _id: user });
-        let movimiento = existUser.movements + 1;
-        let UpdateMovements = await User.findOneAndUpdate({ _id: user }, { movements: movimiento }, { new: true });
+        if (data.nit.length >= 9) return res.send({ message: 'You NIT is invalid' });
+
+
         ///////////////////////////////////////////////////////////       
         if (data.nit.length == 0) {
             data.nit = 'C/F'
@@ -41,7 +41,7 @@ exports.add = async (req, res) => {
         let precioFinal = price * data.cantidad
         data.total = precioFinal
         ////////////////////////////////////////////////////
-        if (data.nit.length >= 9) return res.send({ message: 'You NIT is invalid' });
+
 
         if (existProducto.stock == 0) {
             return res.send({ message: 'We are sorry but this product is currently out of stock.' });
@@ -60,7 +60,11 @@ exports.add = async (req, res) => {
             { $inc: { balance: -data.total } },
             { new: true }
         )
-        if (!producto) return res.send({ message: 'Product not found and not updated' });
+        let existUser = await User.findOne({ _id: user });
+        let movimiento = existUser.movements + 1;
+        let UpdateMovements = await User.findOneAndUpdate({ _id: user }, { movements: movimiento }, { new: true });
+        if (!producto) return res.send({ message: 'Product not found and not updated' })
+
         /////////////////////////////////////////////////////       
         let compra = new Compra(data);
         await compra.save();
